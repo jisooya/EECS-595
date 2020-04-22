@@ -1,0 +1,13 @@
+EECE 595 Assignment 1
+
+In the assignment, I use Python to implement a first-order Hidden Markov Model (HMM) for part-of-speech tagging using the Viterbi algorithm. I use the file wsj1-18.train to train the HMM model. Then I apply the trained model to predict POS tags for each word in the file wsj19-21.test. The training part is written in the file train.py and the testing part and the implementation of Viterbi algorithm are written in the file pos.py. Finally, I compare the predicted results with the ground-truth tags in the file wsj19-21.truth and output the accuracy to evaluate the model. The accuracy of my model is 86.35% without smoothing and 86.13% with smoothing.
+
+During the training part, I first store all data to the corresponding data types. Then I compute transition probabilities matrix A, the emission probabilities matrix B and initial probabilities matrix pi by counting the times of occurrence, dividing the number of counts by total number of occurrence and taking the log probabilities to prevent underflow.
+
+For the smoothing part, I use Katz Backoff to smooth the transition probabilities matrix A and the initial probabilities matrix pi after comparing different results. I compute matrix A because the two successive tags can be regarded as a bigram. I use a matrix N to store the probabilities of each tag being used (in a log scale). Then for the matrix A, if the element is 0, it will be replaced by alpha * P, which is S[i] + N since we now use a log scale (Lecture Slide 1, page 113). Otherwise, it is not changed. For the S[i], its elements are calculated by using the function mentioned in the lecture slide 1 (page 114). The same method can be used to compute elements in the pi matrix so that the data are smoothed.
+
+But actually if I remove the smoothing part, the accuracy will be improved to 86.35%. Although not huge, it is an improvement compared with that used smoothing. So I put the smoothing part as an annotation.
+
+In order to handle "unknown" words, I map the words occurring less than 3 times in training data to the word token 'UNKA'. I first use a list: mixed_words to store all the words appearing in the training file. Then I import Counter from collections to count the times each word occurs in the training data. If the value of the Counter item is less than three, I remove the word from the list: words, which stores all the unique words appearing in the training data. Therefore, in the subsequent processing of probability matrix, if the word is not in the words_dict, the corresponding index would be 0 since we have assigned that words_dict['UNKA'] = 0, which means that the word is an infrequent word.
+
+The smoothing and handling of "unknown" words are all configuration I have used to train the model.
